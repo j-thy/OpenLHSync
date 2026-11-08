@@ -22,7 +22,24 @@ Branches in the forks:
 - openhouse: publishes the room through the named file mapping `Local\openhouse-room` (`src/openvr/room_publisher.cpp`, `include/lh/room_shm.h`).
 - QuestLHSync: the Windows driver reads it (`OurRoom`/`ReadOurRoom` in `src/driver/driver_main.cpp`). Sightings wait while the room settles, a new epoch drops the older ones, and a different room starts the alignment over. Station poses still come from SteamVR.
 
-Testing: start SteamVR with both drivers, then check QuestLHSync's log for `openhouse room ...: sightings follow its settling`, `openhouse room settling: sightings wait` and `openhouse room settled`.
+**Room settle timeout.** openhouse only calls a room settled once every base station it heard from this session is placed, so one seen in passing and never placed held sightings back for the whole session. QuestLHSync now uses sightings anyway after 60 s of settling (`kRoomWaitMax`, `src/driver/sync.h`). Applies on Linux too.
+
+**GitHub Actions build for openhouse** (`.github/workflows/build-windows.yml`): openhouse's Windows build cross-compiles on Linux with vcpkg, so it runs there.
+
+## Installing
+
+Don't use `QuestLHSync-steamvr-installer.exe`: it installs and updates from CreoleVR's releases, which would replace this build with stock (and bring back the custom firmware break).
+
+1. **openhouse** (PC): built by GitHub Actions on [j-thy/openhouse](https://github.com/j-thy/openhouse/actions) (workflow "Build Windows", on every push to `windows-room`). Download the run's artifact, extract it, run `Install-Driver.bat`.
+2. **QuestLHSync driver** (PC): extract `QuestLHSync-steamvr-openlhsync.zip` somewhere permanent and, with SteamVR closed, register the `questlhsync` folder:
+   ```
+   "C:\Program Files (x86)\Steam\steamapps\common\SteamVR\bin\win64\vrpathreg.exe" adddriver "C:\path\to\questlhsync"
+   ```
+   If a stock QuestLHSync is already registered, remove it first (`vrpathreg removedriver <its path>`, or uninstall it with the installer).
+3. **Quest module** (rooted Quest): install `QuestLHSync-quest-module-openlhsync.zip` in Magisk (Modules > Install from storage) and reboot.
+4. Turn off SpaceCalibrator / OpenVR-SpaceSync.
+
+Checking it works, in QuestLHSync's log (`%LOCALAPPDATA%\QuestLHSync`): `openhouse room ...: sightings follow its settling`, then `openhouse room settling: sightings wait`, then `openhouse room settled`. If a room never settles, after 60 s it says `sightings used anyway`.
 
 ## Getting it
 
