@@ -43,7 +43,7 @@ git remote add upstream https://github.com/CreoleVR/QuestLHSync     # once
 git remote add sergio https://github.com/YusufOzmen01/QuestLHSync   # once
 git fetch upstream && git fetch sergio
 git checkout master && git merge --ff-only upstream/master && git push
-git checkout openhouse && git merge upstream/master sergio/master && git push
+git checkout openhouse && git merge upstream/master && git merge sergio/master && git push
 git checkout windows-room && git merge openhouse && git push
 
 cd .. && git add openhouse QuestLHSync && git commit -m "Bump submodules"
