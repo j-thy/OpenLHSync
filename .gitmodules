@@ -1,0 +1,8 @@
+[submodule "openhouse"]
+	path = openhouse
+	url = https://github.com/j-thy/openhouse
+	branch = windows-room
+[submodule "QuestLHSync"]
+	path = QuestLHSync
+	url = https://github.com/j-thy/QuestLHSync
+	branch = windows-room
