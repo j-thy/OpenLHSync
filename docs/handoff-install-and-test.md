@@ -122,7 +122,8 @@ After the reboot, reconnect (new main-screen port from An), and re-run the check
 - `vrserver.txt` has `lh: ` lines and `room settled` / `room not settled: placed ... waiting for ...` lines.
 
 **Quest side**
-- `lhsyncd` running, the PC driver finds the headset (questlhsync.log: the headset's serial / model and `streaming` or frames arriving; `acquiring, last N s: X bright spots ...` with X > 0 once An looks at the base stations).
+- `lhsyncd` running, and the PC driver finds it. questlhsync.log has `<model> at <ip>: connected`, then `<model>: firmware ..., module v1.28` and `camera calibration: ...`. Bad signs: `no QuestLHSync headset answers on the network`, `TCP connect failed`, `no camera frames in ...`, `nothing received for 10 s, reconnecting`.
+- Camera spots arrive: `acquiring, last N s: X bright spots ...` with X > 0 once An looks at the base stations.
 - Headset logcat shows lhsight capturing while SteamVR runs, no crash of the sensors HAL (headset tracking keeps working).
 
 **Windows room fix**
