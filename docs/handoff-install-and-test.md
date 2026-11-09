@@ -34,6 +34,8 @@ Everything else is yours.
 
 ### 2. Get the openhouse build
 
+**Already done (2026-11-09):** `D:\Projects\Quest Pro\builds\openhouse\` holds the extracted artifact of run 42610241222 (`BUILD.json` `source_commit` b3dedf6, clean; the DLL contains `Local\openhouse-room`). Use it unless `windows-room` has moved past b3dedf6; then fetch the newer run as below. The token in `D:\Projects\Quest Pro\.github-token` can download artifacts (`curl -H "Authorization: Bearer <token>" -L https://api.github.com/repos/j-thy/openhouse/actions/artifacts/<id>/zip`); never print or commit it.
+
 The build comes from GitHub Actions on `j-thy/openhouse`, workflow "Build Windows". The latest successful run is for the `windows-room` head; check with:
 
 ```
