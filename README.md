@@ -53,7 +53,7 @@ git clone --recurse-submodules https://github.com/j-thy/OpenLHSync
 cd openhouse
 git remote add upstream https://github.com/YusufOzmen01/openhouse   # once
 git fetch upstream && git checkout master && git merge --ff-only upstream/master && git push
-git checkout windows-room && git rebase master && git push --force-with-lease
+git checkout windows-room && git merge master && git push
 
 cd ../QuestLHSync
 git remote add upstream https://github.com/CreoleVR/QuestLHSync     # once
