@@ -20,9 +20,9 @@ Branches in the forks:
 **Room settling on Windows.** openhouse publishes its room (base station poses, whether the room has settled, an epoch that changes when a station moves) so QuestLHSync can hold off on camera sightings while openhouse solves the room. Upstream only does this on Linux. `windows-room` adds the Windows side:
 
 - openhouse: publishes the room through the named file mapping `Local\openhouse-room` (`src/openvr/room_publisher.cpp`, `include/lh/room_shm.h`).
-- QuestLHSync: the Windows driver reads it (`OurRoom`/`ReadOurRoom` in `src/driver/driver_main.cpp`). Sightings wait while the room settles, a new epoch drops the older ones, and a different room starts the alignment over. Station poses still come from SteamVR.
+- QuestLHSync: the Windows driver reads it (`OurRoom`/`ReadOurRoom` in `src/driver/driver_main.cpp`) the same way Sergio's Linux app does: the stations used are openhouse's well-placed ones (sigma <= 2.5 cm), sightings wait until those have held still for 3 s, a station moving more than 1 cm / 0.3 deg drops the older sightings (`openhouse station moved: epoch N`), and a different room starts the alignment over. A station openhouse hasn't placed yet is left out instead of holding everything back.
 
-**Room settle timeout.** openhouse only calls a room settled once every base station it heard from this session is placed, so one seen in passing and never placed held sightings back for the whole session. QuestLHSync now uses sightings anyway after 60 s of settling (`kRoomWaitMax`, `src/driver/sync.h`). Applies on Linux too.
+**Room settle timeout: removed (2026-11-12).** It covered openhouse's all-stations settled flag never clearing when one station wasn't placed. Judging the room on the well-placed stations only (Sergio's fork, ported to Windows above) fixes that directly.
 
 **GitHub Actions build for openhouse** (`.github/workflows/build-windows.yml`): openhouse's Windows build cross-compiles on Linux with vcpkg, so it runs there.
 
@@ -39,7 +39,7 @@ Don't use `QuestLHSync-steamvr-installer.exe`: it installs and updates from Creo
 3. **Quest module** (rooted Quest): install `QuestLHSync-quest-module-openlhsync.zip` in Magisk (Modules > Install from storage) and reboot.
 4. Turn off SpaceCalibrator / OpenVR-SpaceSync.
 
-Checking it works, in QuestLHSync's log (`%LOCALAPPDATA%\QuestLHSync`): `openhouse room ...: sightings follow its settling`, then `openhouse room settling: sightings wait`, then `openhouse room settled`. If a room never settles, after 60 s it says `sightings used anyway`.
+Checking it works, in QuestLHSync's log (`%LOCALAPPDATA%\QuestLHSync`): `openhouse room ...: sightings follow its settling`, then `openhouse room settling: sightings wait`, then `openhouse room settled`. A station that isn't well placed yet is simply left out; if fewer than two are, sightings keep waiting.
 
 ## Getting it
 
