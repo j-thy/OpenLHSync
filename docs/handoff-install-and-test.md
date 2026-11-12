@@ -34,7 +34,7 @@ Everything else is yours.
 
 ### 2. Get the openhouse build
 
-The current build is the Actions run for `windows-room` @ `ea58663` (v1.0.3 + our two commits). Download it into `D:\Projects\Quest Pro\builds\openhouse-ea58663\` as below and check `BUILD.json` says `ea58663`; older folders under `builds\` are earlier versions. The token in `D:\Projects\Quest Pro\.github-token` can download artifacts (`curl -H "Authorization: Bearer <token>" -L https://api.github.com/repos/j-thy/openhouse/actions/artifacts/<id>/zip`); never print or commit it.
+**Already done (2026-11-12):** `D:\Projects\Quest Pro\builds\openhouse-ea58663\` holds the extracted artifact of run 43264207005 for `windows-room` @ `ea58663` (v1.0.3 + our two commits; `BUILD.json` clean; the DLL contains `Local\openhouse-room`). Use it unless `windows-room` has moved past `ea58663`; then fetch the newer run as below. Older folders under `builds\` are earlier versions. The token in `D:\Projects\Quest Pro\.github-token` can download artifacts (`curl -H "Authorization: Bearer <token>" -L https://api.github.com/repos/j-thy/openhouse/actions/artifacts/<id>/zip`); never print or commit it.
 
 The build comes from GitHub Actions on `j-thy/openhouse`, workflow "Build Windows". The latest successful run is for the `windows-room` head; check with:
 
@@ -48,13 +48,13 @@ Downloading the artifact needs a GitHub login with Actions read access. Try in o
 - `gh run download <run id> -R j-thy/openhouse -D "D:\Projects\Quest Pro\builds\openhouse"` if `gh` is installed and logged in.
 - Else ask An to download it from the run page (Artifacts section) and drop the zip in `D:\Projects\Quest Pro\builds`.
 
-The artifact contains `driver_lighthouse.dll`, `Install-Driver.bat`, `Uninstall-Driver.bat`, `openhouse-driver.ps1`, `apps\`, `BUILD.json`. Check `BUILD.json`'s `source_commit` matches the run's `head_sha`.
+Since v1.0.3 the artifact contains `driver_lighthouse.dll`, `openhouse-installer.exe`, `settingsschema.vrsettings`, `apps\`, `BUILD.json` (no more .bat/.ps1 installer). Check `BUILD.json`'s `source_commit` matches the run's `head_sha`.
 
 ### 3. Install openhouse
 
-- Steam must be fully closed (the script refuses if `steam`, `vrserver`, `vrmonitor`, `vrcompositor` are running). Ask An.
-- Run `Install-Driver.bat` from the extracted folder (or `powershell -NoProfile -ExecutionPolicy Bypass -File openhouse-driver.ps1 Install`). It saves the stock DLL as `driver_lighthouse.dll.stock` the first time.
-- Verify: `openhouse-driver.ps1 Status` shows the installed SHA256 equal to the artifact's `driver_lighthouse.dll`, and "Stock backup present: True".
+- Steam and SteamVR must be closed; the installer offers to close them. Ask An first.
+- From the extracted folder: `openhouse-installer.exe --install --yes` (add `--steamvr "<path>"` if SteamVR is in another Steam library). It keeps SteamVR's own driver as `driver_lighthouse.dll.stock` and registers the update check.
+- Verify: `openhouse-installer.exe --status`, and the installed `<SteamVR>\drivers\lighthouse\bin\win64\driver_lighthouse.dll` has the same SHA256 as the artifact's.
 
 ### 4. Install the QuestLHSync driver
 
@@ -143,7 +143,7 @@ Report: pass/fail per item, the relevant log lines, anything unexpected (errors,
 
 ## Rollback
 
-- openhouse: close Steam, run `Uninstall-Driver.bat` (restores `driver_lighthouse.dll.stock`). Or verify SteamVR's files in Steam.
+- openhouse: `openhouse-installer.exe --uninstall` (puts `driver_lighthouse.dll.stock` back and removes the update check). Or verify SteamVR's files in Steam.
 - QuestLHSync: `vrpathreg removedriver "D:\Projects\Quest Pro\installed\questlhsync"`, re-register the old one if there was one, restore `%LOCALAPPDATA%\QuestLHSync` from the backup.
 - Quest module: `adb shell su -c "touch /data/adb/modules/questlhsync/remove"` and reboot (or uninstall in the Magisk app), then install CreoleVR's 1.28 module if it was there before.
 - Wireless ADB: `adb disconnect`. Leave Wireless debugging and the pairing as An had them.

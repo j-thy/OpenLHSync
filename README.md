@@ -30,7 +30,7 @@ Branches in the forks:
 
 Don't use `QuestLHSync-steamvr-installer.exe`: it installs and updates from CreoleVR's releases, which would replace this build with stock (and bring back the custom firmware break).
 
-1. **openhouse** (PC): built by GitHub Actions on [j-thy/openhouse](https://github.com/j-thy/openhouse/actions) (workflow "Build Windows", on every push to `windows-room`). Download the run's artifact, extract it, run `Install-Driver.bat`.
+1. **openhouse** (PC): built by GitHub Actions on [j-thy/openhouse](https://github.com/j-thy/openhouse/actions) (workflow "Build Windows", on every push to `windows-room`). Download the run's artifact, extract it, run `openhouse-installer.exe` and pick 1 (pick 2 to go back to SteamVR's driver).
 2. **QuestLHSync driver** (PC): extract `QuestLHSync-steamvr-openlhsync.zip` somewhere permanent and, with SteamVR closed, register the `questlhsync` folder:
    ```
    "C:\Program Files (x86)\Steam\steamapps\common\SteamVR\bin\win64\vrpathreg.exe" adddriver "C:\path\to\questlhsync"
