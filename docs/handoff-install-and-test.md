@@ -34,9 +34,9 @@ Everything else is yours.
 
 ### 2. Get the openhouse build
 
-**Already done (2026-11-12):** `D:\Projects\Quest Pro\builds\openhouse-ea58663\` holds the extracted artifact of run 43264207005 for `windows-room` @ `ea58663` (v1.0.3 + our two commits; `BUILD.json` clean; the DLL contains `Local\openhouse-room`). Use it unless `windows-room` has moved past `ea58663`; then fetch the newer run as below. Older folders under `builds\` are earlier versions. The token in `D:\Projects\Quest Pro\.github-token` can download artifacts (`curl -H "Authorization: Bearer <token>" -L https://api.github.com/repos/j-thy/openhouse/actions/artifacts/<id>/zip`); never print or commit it.
+The installed build is in `D:\Projects\Quest Pro\builds\openhouse-<commit>\` for the `windows-room` commit it was built from (`BUILD.json` `source_commit`; the DLL contains `Local\openhouse-room`). If `windows-room` has moved past it, fetch the newer run as below. Older folders under `builds\` are earlier versions. The token in `D:\Projects\Quest Pro\.github-token` can download artifacts (`curl -H "Authorization: Bearer <token>" -L https://api.github.com/repos/j-thy/openhouse/actions/artifacts/<id>/zip`); never print or commit it.
 
-The build comes from GitHub Actions on `j-thy/openhouse`, workflow "Build Windows". The latest successful run is for the `windows-room` head; check with:
+The build comes from GitHub Actions on `j-thy/openhouse`, upstream's workflow "build" (jobs linux, windows, firmware), artifact `openhouse-windows-x64` (a zip holding `openhouse-windows-x64.zip`). The latest successful run is for the `windows-room` head; check with:
 
 ```
 curl.exe -s "https://api.github.com/repos/j-thy/openhouse/actions/runs?per_page=5"

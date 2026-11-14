@@ -24,13 +24,13 @@ Branches in the forks:
 
 **Room settle timeout: removed (2026-11-12).** It covered openhouse's all-stations settled flag never clearing when one station wasn't placed. Judging the room on the well-placed stations only (Sergio's fork, ported to Windows above) fixes that directly.
 
-**GitHub Actions build for openhouse** (`.github/workflows/build-windows.yml`): openhouse's Windows build cross-compiles on Linux with vcpkg, so it runs there.
+**GitHub Actions build for openhouse: dropped (2026-11-13).** Upstream's own `.github/workflows/build.yml` now cross-builds the Windows driver (plus Linux and the firmware) on every push, so it builds `windows-room` too.
 
 ## Installing
 
 Don't use `QuestLHSync-steamvr-installer.exe`: it installs and updates from CreoleVR's releases, which would replace this build with stock (and bring back the custom firmware break).
 
-1. **openhouse** (PC): built by GitHub Actions on [j-thy/openhouse](https://github.com/j-thy/openhouse/actions) (workflow "Build Windows", on every push to `windows-room`). Download the run's artifact, extract it, run `openhouse-installer.exe` and pick 1 (pick 2 to go back to SteamVR's driver).
+1. **openhouse** (PC): built by GitHub Actions on [j-thy/openhouse](https://github.com/j-thy/openhouse/actions) (upstream's workflow "build", on every push to `windows-room`). Download the run's `openhouse-windows-x64` artifact, extract it (it holds `openhouse-windows-x64.zip`; extract that too), run `openhouse-installer.exe` and pick 1 (pick 2 to go back to SteamVR's driver).
 2. **QuestLHSync driver** (PC): extract `QuestLHSync-steamvr-openlhsync.zip` somewhere permanent and, with SteamVR closed, register the `questlhsync` folder:
    ```
    "C:\Program Files (x86)\Steam\steamapps\common\SteamVR\bin\win64\vrpathreg.exe" adddriver "C:\path\to\questlhsync"
