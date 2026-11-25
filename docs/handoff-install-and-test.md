@@ -5,8 +5,8 @@ For Claude Code running on An's Windows PC. Goal: install the openhouse and Ques
 ## Context (read first)
 
 - Repo: `D:\Projects\Quest Pro\OpenLHSync` (private, `j-thy/OpenLHSync`). Submodules on branch `windows-room`:
-  - `openhouse/` = `j-thy/openhouse`: open source replacement for SteamVR's lighthouse driver (`driver_lighthouse.dll`). Our change: publishes its "room" (base station poses, settled flag, epoch) on Windows through the named file mapping `Local\openhouse-room` (`src/openvr/room_publisher.cpp`).
-  - `QuestLHSync/` = `j-thy/QuestLHSync`: SteamVR driver that aligns lighthouse devices to the Quest's tracking using the Quest's cameras. CreoleVR 1.28 + Sergio's fork (1.0 base station channel fix) + our changes: reads openhouse's room on Windows (`OurRoom`/`ReadOurRoom` in `src/driver/driver_main.cpp`) and, like Sergio's Linux app, uses only openhouse's well-placed stations (sigma <= 2.5 cm) and waits until those hold still for 3 s. openhouse is v1.0.3 + our two commits.
+  - `openhouse/` = `j-thy/openhouse`: open source replacement for SteamVR's lighthouse driver (`driver_lighthouse.dll`). Upstream master as is: it publishes its "room" (base station poses, settled flag, epoch) on Windows through the named file mapping `Local\openhouse-room` itself now.
+  - `QuestLHSync/` = `j-thy/QuestLHSync`: SteamVR driver that aligns lighthouse devices to the Quest's tracking using the Quest's cameras. CreoleVR 1.28 + Sergio's "openhouse support" commit (reads openhouse's room on Windows in `src/driver/openhouse.cpp`, uses only its well-placed stations (sigma <= 2.5 cm) and waits until those hold still for 3 s; 1.0 base station channel fix) + our tracking fixes (README, "My changes").
 - Read `README.md` and `docs/openhouse-notes.md` for the rest.
 - Git: author `j-thy <jonathan.ting07@gmail.com>`. **Never add Claude as a co-author or add session trailers.** Don't commit build outputs.
 - Don't touch the user's other SteamVR drivers, Steam settings, or the Quest unless a step below says so.
@@ -58,7 +58,7 @@ Since v1.0.3 the artifact contains `driver_lighthouse.dll`, `openhouse-installer
 
 ### 4. Install the QuestLHSync driver
 
-- Build: `D:\Projects\Quest Pro\builds\QuestLHSync-steamvr-06e3dd7.zip` (built from `QuestLHSync` `windows-room` @ `06e3dd7`). Do **not** use `QuestLHSync-steamvr-installer.exe`: it installs a release from GitHub (CreoleVR's, or Sergio's in his latest fork) without our Windows room reader, and offers to "update" back to it.
+- Build: `D:\Projects\Quest Pro\builds\QuestLHSync-steamvr-<commit>.zip` for the current `QuestLHSync` `windows-room` commit. Do **not** use `QuestLHSync-steamvr-installer.exe`: it installs a release from GitHub (CreoleVR's or Sergio's) without our tracking fixes, and offers to "update" back to it.
 - Extract to a permanent folder: `D:\Projects\Quest Pro\installed\questlhsync`.
 - If a stock QuestLHSync is registered (step 1), unregister it: `vrpathreg removedriver "<its path>"`.
 - Register ours: `vrpathreg adddriver "D:\Projects\Quest Pro\installed\questlhsync"`, then `vrpathreg show` to confirm exactly one questlhsync.
@@ -127,7 +127,7 @@ After the reboot, reconnect (new main-screen port from An), and re-run the check
 - Headset logcat shows lhsight capturing while SteamVR runs, no crash of the sensors HAL (headset tracking keeps working).
 
 **Windows room fix**
-- `questlhsync.log` has `openhouse room room-<n>: sightings follow its settling`. If it says `no openhouse room: stock driver` instead while openhouse is clearly running, the fix failed: report that.
+- `questlhsync.log` has `base stations: openhouse's room <id>`. If it says `base stations: the runtime's (no openhouse room)` instead while openhouse is clearly running, QuestLHSync isn't reading the room: report that.
 - Then `openhouse room settling: sightings wait`, followed by `openhouse room settled` once openhouse's `room settled` appears.
 - QuestLHSync settles on the well-placed stations even while openhouse's own log still says `room not settled ... waiting for` another one. A station that moves logs `openhouse station moved: epoch N`. There is no 60 s timeout any more.
 

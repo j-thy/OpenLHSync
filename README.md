@@ -11,27 +11,31 @@ openhouse (an open source SteamVR lighthouse driver) and QuestLHSync (lighthouse
 
 Branches in the forks:
 
-- `master`: untouched copy of upstream.
-- QuestLHSync `openhouse`: CreoleVR 1.28 with Sergio's fork merged in (openhouse support, 1.0 channel fix, Linux/WiVRn port).
-- `windows-room` (both): my changes, on top of the above.
+- `master`: untouched copy of upstream (may be stale; nothing uses it).
+- openhouse `windows-room`: upstream master as is (2026-11-25). Upstream now publishes the room on Windows itself, which was our only openhouse change.
+- QuestLHSync `openhouse`: Sergio's fork, now one "openhouse support" commit on CreoleVR 1.28 (Windows room reader, well-placed stations only, 1.0 channel fix). He dropped the Linux/WiVRn port.
+- QuestLHSync `windows-room`: Sergio's fork + my changes below.
 
-## My changes
+Both upstreams rewrote their history in November. Instead of force pushing, the forks take each new version as a merge commit whose files are exactly the new version, so the old history stays reachable.
 
-**Room settling on Windows.** openhouse publishes its room (base station poses, whether the room has settled, an epoch that changes when a station moves) so QuestLHSync can hold off on camera sightings while openhouse solves the room. Upstream only does this on Linux. `windows-room` adds the Windows side:
+## My changes (QuestLHSync only)
 
-- openhouse: publishes the room through the named file mapping `Local\openhouse-room` (`src/openvr/room_publisher.cpp`, `include/lh/room_shm.h`).
-- QuestLHSync: the Windows driver reads it (`OurRoom`/`ReadOurRoom` in `src/driver/driver_main.cpp`) the same way Sergio's Linux app does: the stations used are openhouse's well-placed ones (sigma <= 2.5 cm), sightings wait until those have held still for 3 s, a station moving more than 1 cm / 0.3 deg drops the older sightings (`openhouse station moved: epoch N`), and a different room starts the alignment over. A station openhouse hasn't placed yet is left out instead of holding everything back.
+Tracking fixes from the Nov 9-10 testing (see the PC's `test-logs`), on top of Sergio's fork:
 
-**Room settle timeout: removed (2026-11-12).** It covered openhouse's all-stations settled flag never clearing when one station wasn't placed. Judging the room on the well-placed stations only (Sergio's fork, ported to Windows above) fixes that directly.
+- drop camera sightings from well below the horizon (`minSightingElevation`)
+- don't stay locked on support from before a pose break
+- resync the headset clock when it jumps
+- restart the headset's camera reader when frames stop while it is worn
+- re-acquire sooner after a sleep that moved the headset space, only after real sleeps and for a repeated candidate
 
-**GitHub Actions build for openhouse: dropped (2026-11-13).** Upstream's own `.github/workflows/build.yml` now cross-builds the Windows driver (plus Linux and the firmware) on every push, so it builds `windows-room` too.
+**Gone because upstream now covers them:** the Windows room publisher in openhouse, the Windows room reader in QuestLHSync (and its 60 s settle timeout), the 1.0 channel fix, and our openhouse GitHub Actions workflow.
 
 ## Installing
 
-Don't use `QuestLHSync-steamvr-installer.exe`: it installs and updates from CreoleVR's releases, which would replace this build with stock (and bring back the custom firmware break).
+Don't use `QuestLHSync-steamvr-installer.exe`: it installs and updates from a GitHub release (CreoleVR's or Sergio's), which would replace this build and drop the fixes above.
 
 1. **openhouse** (PC): built by GitHub Actions on [j-thy/openhouse](https://github.com/j-thy/openhouse/actions) (upstream's workflow "build", on every push to `windows-room`). Download the run's `openhouse-windows-x64` artifact, extract it (it holds `openhouse-windows-x64.zip`; extract that too), run `openhouse-installer.exe` and pick 1 (pick 2 to go back to SteamVR's driver).
-2. **QuestLHSync driver** (PC): extract `QuestLHSync-steamvr-openlhsync.zip` somewhere permanent and, with SteamVR closed, register the `questlhsync` folder:
+2. **QuestLHSync driver** (PC): extract the QuestLHSync build zip (`QuestLHSync-steamvr-<commit>.zip`) somewhere permanent and, with SteamVR closed, register the `questlhsync` folder:
    ```
    "C:\Program Files (x86)\Steam\steamapps\common\SteamVR\bin\win64\vrpathreg.exe" adddriver "C:\path\to\questlhsync"
    ```
